@@ -32,18 +32,19 @@ endif
 .PHONY: install uninstall publish
 install:
 
-package-m4   := $(wildcard package/*.json)
-
-package.json: %: %.in $(package-m4)
-	$(m4) $< >$@
+package := package.json
+package-conf := $(package).in $(wildcard package/*.json)
 
 npm-modules := escape-string-regexp
 npm-modules := $(addprefix $(modules-prefix)/,$(npm-modules))
-npm-modules := $(addsuffix /package.json,$(npm-modules))
+npm-modules := $(addsuffix /$(package),$(npm-modules))
 
-$(modules-prefix)/%/package.json:
+$(modules-prefix)/%/$(package):
 	$(pnpm-d) $*
-	touch $(package-json).in
+	touch $(firstword $(package-conf))
+
+$(package): $(package-conf) $(npm-modules)
+	$(m4) $< >$@
 
 discordrp-m4 := entry.js $(wildcard cmd/*.js) $(wildcard lib/*.js)
 discordrp-m4 := $(addprefix $(m4-prefix)/,$(discordrp-m4))
@@ -53,7 +54,7 @@ $(m4-prefix)/%: %
 	mkdir -p $(@D)
 	$(m4) $< >$@
 
-$(discordrp)1: $(discordrp-m4) $(npm-modules)
+$(discordrp)1: $(discordrp-m4) $(package)
 	$(esbuild) --banner:js="import { createRequire } from 'node:module'; \
 		   		var require = createRequire(import.meta.url);" \
 		   --sourcemap --platform=node --external:vscode --outfile=$@ $<
@@ -73,10 +74,10 @@ $(discordrp): %: %1$(minimize)
 	printf '\n' >>$@
 	cat $< >>$@
 
-images  := $(wildcard image/*)
+images  := $(wildcard images/*)
 archive := $(prefix)/$(name).vsix
 
-$(archive): README.md package.json $(discordrp)$(debug) $(images)
+$(archive): README.md $(discordrp)$(debug) $(images)
 	vsce package --skip-license -o $@
 
 install: $(archive)
