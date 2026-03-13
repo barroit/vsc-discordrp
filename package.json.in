@@ -1,0 +1,38 @@
+dnl SPDX-License-Identifier: GPL-3.0-or-later
+dnl
+{
+   "name": "discordrp",
+   "type": "module",
+   "version": "0.1.0",
+   "publisher": "barroit",
+   "license": "GPL-3.0-or-later",
+   "main": "build/entry.js",
+   "engines": {
+      "vscode": "^1.74.0"
+   },
+   "devDependencies": {
+      "escape-string-regexp": "^5.0.0",
+      "picomatch": "^4.0.3"
+   },
+   "contributes": {
+      "configuration": {
+         "type": "object",
+         "properties": {
+include([[package/config.json]])dnl
+         }
+      },
+      "commands": [
+include([[package/cmd.json]])dnl
+      ]
+   },
+   "displayName": "Discord Rich Presence",
+   "description": "Display workbench status in discord rich presence",
+   "icon": "images/negi.png",
+   "categories": [
+      "Other"
+   ],
+   "repository": {
+      "type": "git",
+      "url": "git+ssh://git@github.com:barroit/vsc-discordrp.git"
+   }
+}
