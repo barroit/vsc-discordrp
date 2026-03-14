@@ -4,4 +4,4 @@ divert(-1)
 
 define(APP_ID, 1481891463766999111)
 
-divert(0)
+divert(0)dnl

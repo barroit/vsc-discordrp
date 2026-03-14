@@ -27,8 +27,8 @@ include([[package/config.json]])dnl
 include([[package/cmd.json]])dnl
       ]
    },
-   "displayName": "Discord Rich Presence",
-   "description": "Display workbench status in discord rich presence",
+   "displayName": "Discord Rich Presence with Git",
+   "description": "Display repository and workbench status in rich presence",
    "icon": "images/negi.png",
    "categories": [
       "Other"

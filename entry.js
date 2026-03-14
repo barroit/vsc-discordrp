@@ -6,18 +6,21 @@
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 
+import { rp_disabled } from './lib/rp.js'
 import {
 	vsc_resolve_config,
 	vsc_map_ctx,
 	vsc_add_cmd,
 	vsc_exec_cmd,
 } from './lib/vsc.js'
-import { rp_enabled } from './lib/state.js'
 
 const cmds = [
 	[ 'enable',  import('./cmd/enable.js')  ],
 	[ 'disable', import('./cmd/disable.js') ],
-	[ 'disable-tmp', import('./cmd/disable-tmp.js') ],
+	[ 'disable-global', import('./cmd/disable-global.js') ],
+
+	[ 'pause',  import('./cmd/pause.js') ],
+	[ 'resume', import('./cmd/resume.js') ],
 
 	[ 'run',  import('./cmd/run.js')  ],
 	[ 'stop', import('./cmd/stop.js') ],
@@ -44,13 +47,20 @@ async function register_cmd(ctx, [ id, __module ])
 	ctx.cleanup.push(cmd)
 }
 
-export async function activate(__ctx)
+export function activate(__ctx)
 {
 	const ctx = vsc_map_ctx(__ctx)
+	const ipc_ctx = IPC_INIT
 	const register_cmd_fn = register_cmd.bind(undefined, ctx)
 
+	ctx.ipc = ipc_ctx
 	cmds.forEach(register_cmd_fn)
 
-	if (rp_enabled(ctx))
+	if (!rp_disabled(ctx))
 		vsc_exec_cmd('discordrp.run')
+}
+
+export function deactivate()
+{
+	return vsc_exec_cmd('discordrp.pause')
 }

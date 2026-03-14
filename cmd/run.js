@@ -3,7 +3,6 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-import { rp_mark_running } from '../lib/state.js'
 import {
 	ipc_init,
 	ipc_ready,
@@ -11,55 +10,38 @@ import {
 	ipc_replace_rx,
 	ipc_handshake,
 	ipc_presence,
-	ipc_presence_raw,
 } from '../lib/ipc.js'
+import { rp_mark_running, rp_resolve } from '../lib/rp.js'
+import { vsc_track_window_state } from '../lib/vsc.js'
 
 function on_handshake_reply(release)
 {
 	release()
 }
 
-function on_rp_reply(ctx, cmd, evt, data, obj)
+function on_rp_reply(_, __, evt, data)
 {
-	console.log(obj)
-	ctx.cnt++
-
-	if (ctx.cnt != 10)
-		return
-
-	clearInterval(ctx.timer)
-	ipc_presence_raw(ctx.ipc)
+	if (evt == 'ERROR')
+		console.error('on_rp_reply()', data)
 }
 
-function send_activity(ctx)
+function on_window_change(nofity, state)
 {
-	const activity = {
-		state: 'Reviewing patches',
-		state_url: 'https://example.com/session/7c0f6d95-6f5d-4fd3-9c51-4d6b8c72a101',
-		details: 'linux.git | rebase in progress',
-		details_url: 'https://example.com/branch/topic/rpc-cleanup',
-		assets: {
-			large_image: 'kernel_tree',
-			large_text: 'linux.git',
-			large_url: 'https://example.com/repos/linux',
-			small_image: 'clang',
-			small_text: 'Clang 19',
-			small_url: 'https://example.com/toolchains/clang-19',
-		},
-	}
-
-	ipc_presence(ctx.ipc, activity)
+	if (state.focused)
+		nofity()
 }
 
 export async function exec(cmd_ctx)
 {
-	const ipc_ctx = {}
-	const rp_ctx = {}
-	const send_activity_fn = send_activity.bind(undefined, rp_ctx)
+	const ipc_ctx = cmd_ctx.ipc
+	const rp_ctx = RP_INIT
+	const nofity = ipc_presence.bind(undefined, ipc_ctx, rp_ctx)
+	const on_window_change_fn = on_window_change.bind(undefined, nofity)
 
 	let timer
 	let release
 	let barrier
+	let hook
 
 	rp_mark_running()
 
@@ -80,8 +62,8 @@ export async function exec(cmd_ctx)
 	await barrier
 
 	ipc_replace_rx(ipc_ctx, on_rp_reply, rp_ctx)
+	rp_resolve(rp_ctx)
 
-	rp_ctx.cnt = 0
-	rp_ctx.ipc = ipc_ctx
-	rp_ctx.timer = setInterval(send_activity_fn, 2000)
+	hook = vsc_track_window_state(on_window_change_fn)
+	cmd_ctx.cleanup.push(hook)
 }
