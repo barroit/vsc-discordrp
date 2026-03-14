@@ -3,7 +3,9 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-export async function exec()
+import { runtime_dir } from '../entry.js'
+
+export async function exec(ctx)
 {
-	//
+	console.log(runtime_dir)
 }

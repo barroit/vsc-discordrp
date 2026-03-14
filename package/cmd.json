@@ -2,19 +2,31 @@ dnl SPDX-License-Identifier: GPL-3.0-or-later
 dnl
 {
    "command": "discordrp.enable",
-   "title": "enable in current workbench",
+   "title": "enable (this workbench)",
    "category": "discordrp",
    "enablement": "workbenchState != empty"
 },
 {
    "command": "discordrp.disable",
-   "title": "disable in current workbench",
+   "title": "disable (this workbench)",
    "category": "discordrp",
    "enablement": "workbenchState != empty"
 },
 {
    "command": "discordrp.disable-tmp",
-   "title": "disable in current workbench (until exit)",
+   "title": "disable (this workbench, until exit)",
+   "category": "discordrp",
+   "enablement": "workbenchState != empty"
+},
+{
+   "command": "discordrp.run",
+   "title": "run",
+   "category": "discordrp",
+   "enablement": "workbenchState != empty"
+},
+{
+   "command": "discordrp.stop",
+   "title": "stop",
    "category": "discordrp",
    "enablement": "workbenchState != empty"
 }

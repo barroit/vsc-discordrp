@@ -49,10 +49,11 @@ $(package): $(package-conf) $(npm-modules)
 discordrp-m4 := entry.js $(wildcard cmd/*.js) $(wildcard lib/*.js)
 discordrp-m4 := $(addprefix $(m4-prefix)/,$(discordrp-m4))
 discordrp := $(prefix)/entry.js
+m4lib := $(wildcard lib/*.m4)
 
-$(m4-prefix)/%: %
+$(m4-prefix)/%: % $(m4lib)
 	mkdir -p $(@D)
-	$(m4) $< >$@
+	$(m4) $(m4lib) $< >$@
 
 $(discordrp)1: $(discordrp-m4) $(package)
 	$(esbuild) --banner:js="import { createRequire } from 'node:module'; \

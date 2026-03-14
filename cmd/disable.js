@@ -3,7 +3,7 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-export async function exec()
+export async function exec(ctx)
 {
 	//
 }

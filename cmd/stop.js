@@ -5,5 +5,5 @@
 
 export async function exec(ctx)
 {
-	//
+	console.log(ctx)
 }

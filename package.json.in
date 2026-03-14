@@ -13,6 +13,9 @@ dnl
    "devDependencies": {
       "escape-string-regexp": "^5.0.0"
    },
+   "activationEvents": [
+      "onStartupFinished"
+   ],
    "contributes": {
       "configuration": {
          "type": "object",
