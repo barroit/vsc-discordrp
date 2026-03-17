@@ -1,0 +1,3 @@
+[submodule "icon-repo"]
+	path = material-icon
+	url = git@github.com:barroit/vscode-material-icon-theme.git
