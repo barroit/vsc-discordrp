@@ -1,12 +1,7 @@
 dnl SPDX-License-Identifier: GPL-3.0-or-later
 dnl
-"discordrp.test1": {
-   "type": "object",
-   "description": "111",
-   "default": {}
-},
-"spdxheader.test2": {
-   "type": "object",
-   "description": "222",
-   "default": {}
+"discordrp.interval": {
+   "type": "number",
+   "description": "time between activity updates, in milliseconds",
+   "default": 3939
 }

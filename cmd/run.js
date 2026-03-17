@@ -36,10 +36,26 @@ function on_window_change(ipc_ctx, rp_ctx, state)
 	}
 }
 
-function on_interval(ipc_ctx, rp_ctx)
+function bump_interval(cmd_ctx, ipc_ctx, rp_ctx)
 {
+	const on_interval_fn = BIND(on_interval, cmd_ctx, ipc_ctx, rp_ctx)
+
+	clearInterval(cmd_ctx.timer)
+	cmd_ctx.timer = setInterval(on_interval_fn, cmd_ctx.conf.interval)
+}
+
+function on_interval(cmd_ctx, ipc_ctx, rp_ctx)
+{
+	let prev_conf
+
 	if (ipc_ctx.ignore)
 		return
+
+	prev_conf = cmd_ctx.conf
+	cmd_ctx.conf = cmd_ctx.resolve_conf()
+
+	if (prev_conf.interval != cmd_ctx.conf.interval)
+		bump_interval(cmd_ctx, ipc_ctx, rp_ctx)
 
 	if (!rp_resolve(rp_ctx))
 		return
@@ -52,9 +68,8 @@ export async function exec(cmd_ctx)
 	const ipc_ctx = cmd_ctx.ipc
 	const rp_ctx = RP_INIT
 	const on_window_change_fn = BIND(on_window_change, ipc_ctx, rp_ctx)
-	const on_interval_fn = BIND(on_interval, ipc_ctx, rp_ctx)
+	const on_interval_fn = BIND(on_interval, cmd_ctx, ipc_ctx, rp_ctx)
 
-	let timer
 	let release
 	let barrier
 	let hook
@@ -79,8 +94,10 @@ export async function exec(cmd_ctx)
 
 	ipc_replace_rx(ipc_ctx, on_rp_reply, rp_ctx)
 
-	timer = setInterval(on_interval_fn, 2000)
-	hook = new vsc_disposable(() => clearInterval(timer))
+	cmd_ctx.conf = cmd_ctx.resolve_conf()
+	cmd_ctx.timer = setInterval(on_interval_fn, cmd_ctx.conf.interval)
+
+	hook = new vsc_disposable(() => clearInterval(cmd_ctx.timer))
 	cmd_ctx.cleanup.push(hook)
 
 	hook = vsc_track_window_state(on_window_change_fn)

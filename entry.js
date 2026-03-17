@@ -30,7 +30,7 @@ const cmds = [
 const runtime_root = tmpdir()
 export const runtime_dir = mkdtempSync(`${runtime_root}/discordrp-`)
 
-function resolve_format()
+function resolve_conf()
 {
 	return vsc_resolve_config('discordrp')
 }
@@ -40,7 +40,7 @@ async function register_cmd(ctx, [ id, __module ])
 	const module = await __module
 	const cmd_ctx = { ...ctx }
 
-	cmd_ctx.resolve_format = resolve_format
+	cmd_ctx.resolve_conf = resolve_conf
 
 	const exec_fn = BIND(module.exec, cmd_ctx)
 	const cmd = vsc_add_cmd(`discordrp.${id}`, exec_fn)
