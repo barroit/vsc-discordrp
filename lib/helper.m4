@@ -2,6 +2,8 @@ dnl SPDX-License-Identifier: GPL-3.0-or-later
 dnl
 divert(-1)
 
+define(DEVICON, https://cdn.jsdelivr.net/gh/barroit/devicon@master/icons)
+
 define(NOW, Math.floor(Date.now() / 1000))
 
 define(IPC_INIT, [[{ ignore: 0 }]])

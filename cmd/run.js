@@ -19,16 +19,17 @@ function on_handshake_reply(release)
 	release()
 }
 
-function on_rp_reply(_, __, evt, data, obj)
+function on_rp_reply(_, __, evt, data)
 {
 	if (evt == 'ERROR')
 		console.error('on_rp_reply()', data)
 }
 
-function on_window_change(ipc_ctx, state)
+function on_window_change(ipc_ctx, rp_ctx, state)
 {
 	if (state.focused) {
 		ipc_ctx.ignore = 0
+		ipc_presence(ipc_ctx, rp_ctx)
 	} else {
 		ipc_ctx.ignore = 1
 		ipc_presence(ipc_ctx, undefined, 1)
@@ -44,14 +45,13 @@ function on_interval(ipc_ctx, rp_ctx)
 		return
 
 	ipc_presence(ipc_ctx, rp_ctx)
-	console.log(1)
 }
 
 export async function exec(cmd_ctx)
 {
 	const ipc_ctx = cmd_ctx.ipc
 	const rp_ctx = RP_INIT
-	const on_window_change_fn = BIND(on_window_change, ipc_ctx)
+	const on_window_change_fn = BIND(on_window_change, ipc_ctx, rp_ctx)
 	const on_interval_fn = BIND(on_interval, ipc_ctx, rp_ctx)
 
 	let timer
