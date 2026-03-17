@@ -3,5 +3,5 @@ dnl
 "discordrp.interval": {
    "type": "number",
    "description": "time between activity updates, in milliseconds",
-   "default": 3939
+   "default": 1039
 }

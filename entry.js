@@ -53,10 +53,9 @@ export async function activate(__ctx)
 	await git_ensure_exec()
 
 	const ctx = vsc_map_ctx(__ctx)
-	const ipc_ctx = IPC_INIT
 	const register_cmd_fn = BIND(register_cmd, ctx)
 
-	ctx.ipc = ipc_ctx
+	ctx.ctrl = {}
 	cmds.forEach(register_cmd_fn)
 
 	if (!rp_disabled(ctx))
