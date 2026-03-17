@@ -4,7 +4,7 @@ divert(-1)
 
 define(NOW, Math.floor(Date.now() / 1000))
 
-define(IPC_INIT, [[{}]])
+define(IPC_INIT, [[{ ignore: 0 }]])
 define(RP_INIT,  [[{ assets: {}, timestamps: { start: NOW } }]])
 
 define(BIND, $1.bind(undefined, [[shift($@)]]))

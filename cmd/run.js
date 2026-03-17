@@ -12,7 +12,7 @@ import {
 	ipc_presence,
 } from '../lib/ipc.js'
 import { rp_mark_running, rp_resolve } from '../lib/rp.js'
-import { vsc_track_window_state } from '../lib/vsc.js'
+import { vsc_track_window_state, vsc_disposable } from '../lib/vsc.js'
 
 function on_handshake_reply(release)
 {
@@ -25,21 +25,34 @@ function on_rp_reply(_, __, evt, data, obj)
 		console.error('on_rp_reply()', data)
 }
 
-function on_window_change(ipc_ctx, rp_ctx, state)
+function on_window_change(ipc_ctx, state)
 {
-	if (state.focused)
-		rp_resolve(rp_ctx)
-	else
-		rp_ctx = undefined
+	if (state.focused) {
+		ipc_ctx.ignore = 0
+	} else {
+		ipc_ctx.ignore = 1
+		ipc_presence(ipc_ctx, undefined, 1)
+	}
+}
+
+function on_interval(ipc_ctx, rp_ctx)
+{
+	if (ipc_ctx.ignore)
+		return
+
+	if (!rp_resolve(rp_ctx))
+		return
 
 	ipc_presence(ipc_ctx, rp_ctx)
+	console.log(1)
 }
 
 export async function exec(cmd_ctx)
 {
 	const ipc_ctx = cmd_ctx.ipc
 	const rp_ctx = RP_INIT
-	const on_window_change_fn = BIND(on_window_change, ipc_ctx, rp_ctx)
+	const on_window_change_fn = BIND(on_window_change, ipc_ctx)
+	const on_interval_fn = BIND(on_interval, ipc_ctx, rp_ctx)
 
 	let timer
 	let release
@@ -65,6 +78,10 @@ export async function exec(cmd_ctx)
 	await barrier
 
 	ipc_replace_rx(ipc_ctx, on_rp_reply, rp_ctx)
+
+	timer = setInterval(on_interval_fn, 2000)
+	hook = new vsc_disposable(() => cleanInterval(timer))
+	cmd_ctx.cleanup.push(hook)
 
 	hook = vsc_track_window_state(on_window_change_fn)
 	cmd_ctx.cleanup.push(hook)

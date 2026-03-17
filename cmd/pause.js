@@ -4,10 +4,12 @@
  */
 
 import { ipc_presence } from '../lib/ipc.js'
-import { rp_pause } from '../lib/rp.js'
+import { rp_mark_paused } from '../lib/rp.js'
 
 export async function exec(ctx)
 {
-	ipc_presence(ctx.ipc)
-	rp_pause()
+	ipc_ctx.ignore = 1
+	ipc_presence(ctx.ipc, undefined, 1)
+
+	rp_mark_paused()
 }
