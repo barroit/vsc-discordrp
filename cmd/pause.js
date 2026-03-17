@@ -8,7 +8,7 @@ import { rp_mark_paused } from '../lib/rp.js'
 
 export async function exec(ctx)
 {
-	ipc_ctx.ignore = 1
+	ctx.ipc.ignore = 1
 	ipc_presence(ctx.ipc, undefined, 1)
 
 	rp_mark_paused()

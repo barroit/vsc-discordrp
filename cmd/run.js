@@ -80,7 +80,7 @@ export async function exec(cmd_ctx)
 	ipc_replace_rx(ipc_ctx, on_rp_reply, rp_ctx)
 
 	timer = setInterval(on_interval_fn, 2000)
-	hook = new vsc_disposable(() => cleanInterval(timer))
+	hook = new vsc_disposable(() => clearInterval(timer))
 	cmd_ctx.cleanup.push(hook)
 
 	hook = vsc_track_window_state(on_window_change_fn)
