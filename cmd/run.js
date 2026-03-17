@@ -19,24 +19,27 @@ function on_handshake_reply(release)
 	release()
 }
 
-function on_rp_reply(_, __, evt, data)
+function on_rp_reply(_, __, evt, data, obj)
 {
 	if (evt == 'ERROR')
 		console.error('on_rp_reply()', data)
 }
 
-function on_window_change(nofity, state)
+function on_window_change(ipc_ctx, rp_ctx, state)
 {
 	if (state.focused)
-		nofity()
+		rp_resolve(rp_ctx)
+	else
+		rp_ctx = undefined
+
+	ipc_presence(ipc_ctx, rp_ctx)
 }
 
 export async function exec(cmd_ctx)
 {
 	const ipc_ctx = cmd_ctx.ipc
 	const rp_ctx = RP_INIT
-	const nofity = ipc_presence.bind(undefined, ipc_ctx, rp_ctx)
-	const on_window_change_fn = on_window_change.bind(undefined, nofity)
+	const on_window_change_fn = BIND(on_window_change, ipc_ctx, rp_ctx)
 
 	let timer
 	let release
@@ -62,7 +65,6 @@ export async function exec(cmd_ctx)
 	await barrier
 
 	ipc_replace_rx(ipc_ctx, on_rp_reply, rp_ctx)
-	rp_resolve(rp_ctx)
 
 	hook = vsc_track_window_state(on_window_change_fn)
 	cmd_ctx.cleanup.push(hook)

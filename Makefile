@@ -7,7 +7,7 @@ pnpm += install
 pnpm-d := $(pnpm) -D
 
 m4 ?= m4
-m4 := printf 'changequote([[, ]])undefine(shift)' | $(m4) -
+m4 := printf 'changequote([[, ]])' | $(m4) -
 
 esbuild ?= esbuild
 esbuild += --bundle --format=esm

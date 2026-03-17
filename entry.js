@@ -6,6 +6,7 @@
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 
+import { git_ensure_exec } from './lib/git.js'
 import { rp_disabled } from './lib/rp.js'
 import {
 	vsc_resolve_config,
@@ -41,17 +42,19 @@ async function register_cmd(ctx, [ id, __module ])
 
 	cmd_ctx.resolve_format = resolve_format
 
-	const exec_fn = module.exec.bind(undefined, cmd_ctx)
+	const exec_fn = BIND(module.exec, cmd_ctx)
 	const cmd = vsc_add_cmd(`discordrp.${id}`, exec_fn)
 
 	ctx.cleanup.push(cmd)
 }
 
-export function activate(__ctx)
+export async function activate(__ctx)
 {
+	await git_ensure_exec()
+
 	const ctx = vsc_map_ctx(__ctx)
 	const ipc_ctx = IPC_INIT
-	const register_cmd_fn = register_cmd.bind(undefined, ctx)
+	const register_cmd_fn = BIND(register_cmd, ctx)
 
 	ctx.ipc = ipc_ctx
 	cmds.forEach(register_cmd_fn)

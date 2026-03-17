@@ -5,6 +5,8 @@ divert(-1)
 define(NOW, Math.floor(Date.now() / 1000))
 
 define(IPC_INIT, [[{}]])
-define(RP_INIT,  [[{ asssets: {}, timestamps: {} }]])
+define(RP_INIT,  [[{ assets: {}, timestamps: { start: NOW } }]])
+
+define(BIND, $1.bind(undefined, [[shift($@)]]))
 
 divert(0)dnl
