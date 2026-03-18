@@ -1,44 +1,32 @@
 dnl SPDX-License-Identifier: GPL-3.0-or-later
 dnl
 {
-   "command": "discordrp.enable",
-   "title": "enable",
-   "category": "discordrp",
-   "enablement": "workbenchState != empty"
-},
-{
-   "command": "discordrp.disable",
-   "title": "disable",
-   "category": "discordrp",
-   "enablement": "workbenchState != empty"
-},
-{
-   "command": "discordrp.disable-global",
-   "title": "disable (all workbenches)",
-   "category": "discordrp",
-   "enablement": "workbenchState != empty"
-},
-{
-   "command": "discordrp.resume",
-   "title": "resume",
-   "category": "discordrp",
-   "enablement": "workbenchState != empty"
-},
-{
-   "command": "discordrp.pause",
-   "title": "pause",
-   "category": "discordrp",
-   "enablement": "workbenchState != empty"
-},
-{
-   "command": "discordrp.run",
+   "command": "CMD_RUN",
    "title": "run",
    "category": "discordrp",
    "enablement": "workbenchState != empty"
 },
 {
-   "command": "discordrp.stop",
-   "title": "stop",
+   "command": "CMD_RESUME",
+   "title": "resume",
+   "category": "discordrp",
+   "enablement": "workbenchState != empty"
+},
+{
+   "command": "CMD_PAUSE",
+   "title": "pause",
+   "category": "discordrp",
+   "enablement": "workbenchState != empty"
+},
+{
+   "command": "CMD_ENABLE",
+   "title": "enable",
+   "category": "discordrp",
+   "enablement": "workbenchState != empty"
+},
+{
+   "command": "CMD_DISABLE",
+   "title": "disable",
    "category": "discordrp",
    "enablement": "workbenchState != empty"
 }

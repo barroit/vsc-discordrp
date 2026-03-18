@@ -3,11 +3,12 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-import { rp_resume } from '../lib/rp.js'
+import { rp_running, rp_resume } from '../lib/rp.js'
 
-export async function exec(ctx)
+export function exec(ctx)
 {
 	rp_resume()
 
-	ctx.ctrl.resume_rp()
+	if (rp_running())
+		ctx.ctrl.resume_rp()
 }

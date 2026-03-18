@@ -3,11 +3,12 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-import { rp_mark_paused } from '../lib/rp.js'
+import { rp_running, rp_mark_paused } from '../lib/rp.js'
 
-export async function exec(ctx)
+export function exec(ctx)
 {
 	rp_mark_paused()
 
-	ctx.ctrl.pause_rp()
+	if (rp_running())
+		ctx.ctrl.pause_rp()
 }

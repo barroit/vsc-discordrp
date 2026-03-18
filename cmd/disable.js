@@ -3,7 +3,12 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-export async function exec(ctx)
+import { rp_mark_disabled } from '../lib/rp.js'
+import { vsc_exec_cmd } from '../lib/vsc.js'
+
+export function exec(ctx)
 {
-	//
+	rp_mark_disabled(ctx)
+
+	vsc_exec_cmd('CMD_PAUSE')
 }

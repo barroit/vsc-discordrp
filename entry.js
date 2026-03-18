@@ -15,17 +15,7 @@ import {
 	vsc_exec_cmd,
 } from './lib/vsc.js'
 
-const cmds = [
-	[ 'enable',  import('./cmd/enable.js')  ],
-	[ 'disable', import('./cmd/disable.js') ],
-	[ 'disable-global', import('./cmd/disable-global.js') ],
-
-	[ 'pause',  import('./cmd/pause.js') ],
-	[ 'resume', import('./cmd/resume.js') ],
-
-	[ 'run',  import('./cmd/run.js')  ],
-	[ 'stop', import('./cmd/stop.js') ],
-]
+import cmds from './cmdlist.js'
 
 const runtime_root = tmpdir()
 export const runtime_dir = mkdtempSync(`${runtime_root}/discordrp-`)
@@ -35,7 +25,7 @@ function resolve_conf()
 	return vsc_resolve_config('discordrp')
 }
 
-async function register_cmd(ctx, [ id, __module ])
+async function register_cmd(ctx, [ name, __module ])
 {
 	const module = await __module
 	const cmd_ctx = { ...ctx }
@@ -43,7 +33,7 @@ async function register_cmd(ctx, [ id, __module ])
 	cmd_ctx.resolve_conf = resolve_conf
 
 	const exec_fn = BIND(module.exec, cmd_ctx)
-	const cmd = vsc_add_cmd(`discordrp.${id}`, exec_fn)
+	const cmd = vsc_add_cmd(name, exec_fn)
 
 	ctx.cleanup.push(cmd)
 }
@@ -59,10 +49,10 @@ export async function activate(__ctx)
 	cmds.forEach(register_cmd_fn)
 
 	if (!rp_disabled(ctx))
-		vsc_exec_cmd('discordrp.run')
+		vsc_exec_cmd('CMD_RUN')
 }
 
 export function deactivate()
 {
-	return vsc_exec_cmd('discordrp.pause')
+	return vsc_exec_cmd('CMD_PAUSE')
 }

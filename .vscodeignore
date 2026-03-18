@@ -3,6 +3,6 @@
 **/*
 
 !LICENSES/**
-!build/entry.js*
+!build/entry.js
 !images/**
 !README

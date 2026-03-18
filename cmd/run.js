@@ -1,6 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /*
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
+ *
+ * Don't handle enable/disable in this command.
  */
 
 import {
@@ -15,7 +17,7 @@ import {
 	rp_mark_running,
 	rp_resolve,
 	rp_paused,
-	rp_disabled,
+	rp_running,
 } from '../lib/rp.js'
 import { vsc_track_window_state, vsc_disposable } from '../lib/vsc.js'
 
@@ -76,7 +78,7 @@ function resume_rp(cmd_ctx, ipc_ctx)
 
 function on_focus_move(cmd_ctx, state)
 {
-	if (rp_paused() || rp_disabled(cmd_ctx))
+	if (rp_paused())
 		return
 
 	if (state.focused)
@@ -95,12 +97,15 @@ export async function exec(cmd_ctx)
 	let barrier
 	let hook
 
+	if (rp_running())
+		return
+	else
+		rp_mark_running()
+
 	cmd_ctx.ctrl.sync_rp = BIND(sync_rp, cmd_ctx, ipc_ctx, rp_ctx)
 	cmd_ctx.ctrl.clean_rp = BIND(clean_rp, ipc_ctx)
 	cmd_ctx.ctrl.pause_rp = BIND(pause_rp, cmd_ctx, ipc_ctx)
 	cmd_ctx.ctrl.resume_rp = BIND(resume_rp, cmd_ctx, ipc_ctx)
-
-	rp_mark_running()
 
 	while (39) {
 		await ipc_init(ipc_ctx)

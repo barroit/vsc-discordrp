@@ -22,7 +22,8 @@ m4-prefix := $(prefix)/m4
 modules-prefix := node_modules
 icomap-prefix := material-icon/src/core/icons
 
-gen-icomap := scripts/gen-icomap.ts
+gen-cmdlist := scripts/gen-cmdlist.sh
+gen-icomap  := scripts/gen-icomap.ts
 
 ifneq ($(minimize),)
 	minimize := -terser
@@ -42,22 +43,31 @@ npm-modules := escape-string-regexp
 npm-modules := $(addprefix $(modules-prefix)/,$(npm-modules))
 npm-modules := $(addsuffix /$(package),$(npm-modules))
 
+cmdef := lib/cmd.m4
+
 $(modules-prefix)/%/$(package):
 	$(pnpm-d) $*
 	touch $(firstword $(package-conf))
 
-$(package): $(package-conf) $(npm-modules)
-	$(m4) $< >$@
+$(package): $(package-conf) $(npm-modules) $(cmdef)
+	$(m4) $(cmdef) $< >$@
+
+cmds := $(wildcard cmd/*)
+cmdlist := $(m4-prefix)/cmdlist.js
+
+cmdlist.js: $(cmds) $(cmdef)
+	ls cmd/* | $(gen-cmdlist) >$@
 
 discordrp-m4 := entry.js $(wildcard cmd/*.js) $(wildcard lib/*.js)
 discordrp-m4 := $(addprefix $(m4-prefix)/,$(discordrp-m4))
 discordrp := $(prefix)/entry.js
 m4lib := $(wildcard lib/*.m4)
 
-$(m4-prefix)/%: % $(m4lib)
-	mkdir -p $(@D)
-	$(m4) $(m4lib) $< >$@
+$(cmdlist): cmdlist.js
 
+$(m4-prefix)/%: $(m4lib) %
+	mkdir -p $(@D)
+	$(m4) $^ >$@
 
 icomap := $(m4-prefix)/icomap.js
 
@@ -70,7 +80,7 @@ $(icomap): $(icomap)on
 	printf 'export default ' >>$@
 	cat $(icomap)on >>$@
 
-$(discordrp)1: $(discordrp-m4) $(package) $(icomap)
+$(discordrp)1: $(discordrp-m4) $(package) $(icomap) $(cmdlist)
 	$(esbuild) --banner:js="import { createRequire } from 'node:module'; \
 		   		var require = createRequire(import.meta.url);" \
 		   --sourcemap --platform=node --external:vscode --outfile=$@ $<
@@ -109,7 +119,8 @@ publish: $(archive)
 .PHONY: clean distclean
 
 clean:
-	rm -f $(archive) $(discordrp-m4) $(icomap)* $(discordrp)*
+	rm -f $(archive) $(discordrp-m4) $(icomap)* $(discordrp)* $(package) \
+	      cmdlist.js $(cmdlist)
 
 distclean: clean
 	test -d $(modules-prefix) && \
