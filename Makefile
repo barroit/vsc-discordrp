@@ -83,6 +83,9 @@ archive := $(prefix)/$(name).vsix
 $(archive): README.md $(discordrp) $(images)
 	vsce package --skip-license -o $@
 
+README.md: lib/jsdelivr.m4 NOTREADME.md
+	$(m4) $^ >$@
+
 install: $(archive)
 	code --install-extension $<
 

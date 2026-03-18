@@ -3,4 +3,6 @@
 /build
 /.tmp-*
 /package.json
+
 /cmdlist.js
+/README.md

@@ -4,5 +4,6 @@
 
 !LICENSES/**
 !build/entry.js
-!images/**
-!README
+!images/negi.png
+!images/README
+!README.md
