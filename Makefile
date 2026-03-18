@@ -93,7 +93,7 @@ uninstall:
 	code --uninstall-extension \
 	     $$(code --list-extensions | grep $(name) || printf '39\n')
 
-publish: $(archive)
+publish:
 	vsce publish --skip-license
 
 .PHONY: clean distclean
