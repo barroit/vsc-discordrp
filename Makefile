@@ -2,15 +2,11 @@
 
 name := discordrp
 
-pnpm ?= pnpm
-pnpm += install
-pnpm-d := $(pnpm) -D
-
 m4 ?= m4
 m4 := printf 'changequote([[, ]])' | $(m4) -
 
 esbuild ?= esbuild
-esbuild += --bundle --format=esm
+esbuild += --bundle --format=esm --platform=node
 esbuild += --define:NULL=null --define:NAME='"$(name)"'
 
 terser ?= terser
@@ -19,7 +15,6 @@ terser += --module --ecma 2020 --mangle --comments false \
 
 prefix := build
 m4-prefix := $(prefix)/m4
-modules-prefix := node_modules
 icomap-prefix := material-icon/src/core/icons
 
 gen-cmdlist := scripts/gen-cmdlist.sh
@@ -29,27 +24,14 @@ ifneq ($(minimize),)
 	minimize := -terser
 endif
 
-ifneq ($(debug),)
-	debug := -debug
-endif
-
 .PHONY: install uninstall publish
 install:
 
 package := package.json
 package-conf := $(package).in $(wildcard package/*.json)
-
-npm-modules := escape-string-regexp
-npm-modules := $(addprefix $(modules-prefix)/,$(npm-modules))
-npm-modules := $(addsuffix /$(package),$(npm-modules))
-
 cmdef := lib/cmd.m4
 
-$(modules-prefix)/%/$(package):
-	$(pnpm-d) $*
-	touch $(firstword $(package-conf))
-
-$(package): $(package-conf) $(npm-modules) $(cmdef)
+$(package): $(package-conf) $(cmdef)
 	$(m4) $(cmdef) $< >$@
 
 cmds := $(wildcard cmd/*)
@@ -83,17 +65,12 @@ $(icomap): $(icomap)on
 $(discordrp)1: $(discordrp-m4) $(package) $(icomap) $(cmdlist)
 	$(esbuild) --banner:js="import { createRequire } from 'node:module'; \
 		   		var require = createRequire(import.meta.url);" \
-		   --sourcemap --platform=node --external:vscode --outfile=$@ $<
+		   --sourcemap=inline --external:vscode --outfile=$@ $<
 
 discordrp-terser := $(addsuffix 1-terser,$(discordrp))
-discordrp-debug  := $(addsuffix -debug,$(discordrp))
 
 $(discordrp-terser): %1-terser: %1
 	$(terser) <$< >$@
-
-$(discordrp-debug): %-debug: %1
-	ln -f $< $@
-	ln -f $< $*
 
 $(discordrp): %: %1$(minimize)
 	head -n1 entry.js >$@
@@ -103,7 +80,7 @@ $(discordrp): %: %1$(minimize)
 images  := $(wildcard images/*)
 archive := $(prefix)/$(name).vsix
 
-$(archive): README.md $(discordrp)$(debug) $(images)
+$(archive): README.md $(discordrp) $(images)
 	vsce package --skip-license -o $@
 
 install: $(archive)
@@ -119,9 +96,7 @@ publish: $(archive)
 .PHONY: clean distclean
 
 clean:
-	rm -f $(archive) $(discordrp-m4) $(icomap)* $(discordrp)* $(package) \
-	      cmdlist.js $(cmdlist)
+	rm -f $(archive) $(discordrp-m4) $(icomap)* $(discordrp)* $(cmdlist)
 
 distclean: clean
-	test -d $(modules-prefix) && \
-	find $(modules-prefix) -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+	rm -f $(package) cmdlist.js README.md

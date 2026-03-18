@@ -10,9 +10,6 @@ dnl
    "engines": {
       "vscode": "^1.74.0"
    },
-   "devDependencies": {
-      "escape-string-regexp": "^5.0.0"
-   },
    "activationEvents": [
       "onStartupFinished"
    ],
